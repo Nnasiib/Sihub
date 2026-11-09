@@ -1,0 +1,8 @@
+{
+  "name": "SiHub Digital Ecosystem",
+  "description": "Somali Innovation Hub (SiHub) - Connecting People, Empowering Ideas, Creating Opportunities. Complete interactive website & digital ecosystem demo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

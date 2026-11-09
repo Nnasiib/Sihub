@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SiHub Legacy Data Export</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 720px; margin: 3rem auto; padding: 0 1rem; color: #172033; }
+    button { padding: .7rem 1rem; font-weight: 700; }
+    #status { margin-top: 1rem; white-space: pre-wrap; }
+    .warning { border-left: 4px solid #d97706; padding: .8rem 1rem; background: #fffbeb; }
+  </style>
+</head>
+<body>
+  <h1>SiHub legacy data export</h1>
+  <p>This one-time tool reads existing <code>sihub_demo_*</code> browser records and downloads them as JSON. It does not upload, change, or delete browser data.</p>
+  <p class="warning">The export may contain personal or sensitive information. Store it securely and only provide it to an authorized SiHub administrator for local import.</p>
+  <button id="export" type="button">Download browser data export</button>
+  <p id="status" role="status"></p>
+  <script>
+    const keys = [
+      'sihub_demo_users_v1', 'sihub_demo_courses_v1', 'sihub_demo_enrollments_v1',
+      'sihub_demo_startups_v1', 'sihub_demo_innovation_v1', 'sihub_demo_programs_v1',
+      'sihub_demo_program_apps_v1', 'sihub_demo_events_v1', 'sihub_demo_event_regs_v1',
+      'sihub_demo_mentors_v1', 'sihub_demo_mentorship_reqs_v1', 'sihub_demo_opportunities_v1',
+      'sihub_demo_opportunity_apps_v1', 'sihub_demo_partners_v1', 'sihub_demo_partner_inquiries_v1',
+      'sihub_demo_community_members_v1', 'sihub_demo_forum_topics_v1', 'sihub_demo_news_v1',
+      'sihub_demo_impact_v1', 'sihub_demo_audit_v1', 'sihub_demo_edu_departments_v1',
+      'sihub_demo_edu_programs_v1', 'sihub_demo_edu_cohorts_v1', 'sihub_demo_edu_assignments_v1',
+      'sihub_demo_edu_submissions_v1', 'sihub_demo_edu_exams_v1', 'sihub_demo_edu_exam_results_v1',
+      'sihub_demo_edu_attendance_v1', 'sihub_demo_edu_certificates_v1', 'sihub_demo_visit_requests_v1',
+      'sihub_demo_visitor_passes_v1', 'sihub_demo_student_profiles_v1'
+    ];
+    document.querySelector('#export').addEventListener('click', () => {
+      try {
+        const buckets = Object.fromEntries(keys.map(key => [key, localStorage.getItem(key)]).filter(([, value]) => value !== null));
+        const payload = { format: 'sihub-localstorage-export-v1', exportedAt: new Date().toISOString(), buckets };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `sihub-local-data-${new Date().toISOString().slice(0, 10)}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+        document.querySelector('#status').textContent = `Exported ${Object.keys(buckets).length} stored buckets. Browser data was not modified.`;
+      } catch {
+        document.querySelector('#status').textContent = 'Export failed. Check browser storage access and try again.';
+      }
+    });
+  </script>
+</body>
+</html>
